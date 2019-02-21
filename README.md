@@ -9,4 +9,6 @@ This has been a [common issue](https://github.com/moby/moby/issues/29362) with t
 ## Basic Usage Example
 `nonce -i <docker image you wish to build> -n <number of nodes> -I <name of your primary interface>` 
 
+You can reference the [blockchain Dockerfiles](https://github.com/zscole/blockchain-dockerfiles) repo to get an idea for how the Dockerfiles should be structured.
+
 Contact zcole@linux.com for questions, comments, or concerns. 
