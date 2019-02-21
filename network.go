@@ -14,7 +14,7 @@ func buildNetwork(nodes, start int) {
 
 	for i := start; i < nodes+start; i++ {
 		// remove networks
-		CleanNetCMD := "docker network rm " + fmt.Sprintf("wb_vlan%d", i)
+		CleanNetCMD := "docker network rm " + fmt.Sprintf("vlan%d", i)
 		Cleanparts := strings.Fields(CleanNetCMD)
 		Cleanhead := Cleanparts[0]
 		Cleanparts = Cleanparts[1:len(Cleanparts)]
@@ -28,7 +28,7 @@ func buildNetwork(nodes, start int) {
 
 		fmt.Printf("-------------Building Node%d Network-------------\n", i)
 
-		cmd := "docker network create -d macvlan --subnet " + getSubnetByVlan(server, i) + " --gateway " + getGateway(server, i) + " -o parent=" + iface + "." + fmt.Sprintf("%d", i+101) + " " + fmt.Sprintf("wb_vlan%d", i)
+		cmd := "docker network create -d macvlan --subnet " + getSubnetByVlan(server, i) + " --gateway " + getGateway(server, i) + " -o parent=" + iface + "." + fmt.Sprintf("%d", i+101) + " " + fmt.Sprintf("vlan%d", i)
 
 		parts := strings.Fields(cmd)
 		head := parts[0]

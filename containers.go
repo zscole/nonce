@@ -28,18 +28,14 @@ func buildContainer(image string, nodes int) {
 	}
 
 	bindings := nat.PortMap{}
-
 	emptypaths := []string{}
-
 	restartpol := pepe.RestartPolicy{
 		Name: "no",
 	}
 
 	for i := start; i < nodes+start; i++ {
 		fmt.Printf("Building Node %d...\n", i)
-
-		vlan := fmt.Sprintf("wb_vlan%d", i)
-
+		vlan := fmt.Sprintf("vlan%d", i)
 		hostConf := pepe.HostConfig{
 			NetworkMode:     pepe.NetworkMode(vlan),
 			PublishAllPorts: false,
@@ -52,7 +48,7 @@ func buildContainer(image string, nodes int) {
 			RestartPolicy:   restartpol,
 		}
 
-		resp, err := cli.ContainerCreate(ctx, &conf, &hostConf, nil, fmt.Sprintf("whiteblock-node%d", i))
+		resp, err := cli.ContainerCreate(ctx, &conf, &hostConf, nil, fmt.Sprintf("node%d", i))
 		if err != nil {
 			panic(err)
 		}
@@ -70,7 +66,6 @@ func buildContainer(image string, nodes int) {
 		if err != nil {
 			panic(err)
 		}
-
 		io.Copy(os.Stdout, out)
 	}
 }
@@ -85,7 +80,7 @@ func startContainer(start, nodes int) {
 
 	for i := start; i < nodes+start; i++ {
 		fmt.Printf("Starting Node %d...\n", i)
-		if err := cli.ContainerStart(ctx, fmt.Sprintf("whiteblock-node%d", i), types.ContainerStartOptions{}); err != nil {
+		if err := cli.ContainerStart(ctx, fmt.Sprintf("node%d", i), types.ContainerStartOptions{}); err != nil {
 			panic(err)
 		}
 	}
@@ -94,15 +89,13 @@ func startContainer(start, nodes int) {
 func joinNetwork(start, nodes int) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.WithVersion("1.35"))
-	// cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		panic(err)
 	}
 
 	for i := start; i < nodes+start; i++ {
-
-		var nodeName = fmt.Sprintf("whiteblock-node%d", i)
-		var networkName = fmt.Sprintf("wb_vlan%d", i)
+		var nodeName = fmt.Sprintf("node%d", i)
+		var networkName = fmt.Sprintf("vlan%d", i)
 
 		epSettings := network.EndpointSettings{}
 
@@ -113,7 +106,6 @@ func joinNetwork(start, nodes int) {
 func deleteContainer(start, nodes int) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.WithVersion("1.35"))
-	// cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +113,7 @@ func deleteContainer(start, nodes int) {
 	fmt.Printf("Removing Container %d...\n", nodes)
 
 	for i := start; i < nodes+start; i++ {
-		cli.ContainerRemove(ctx, fmt.Sprintf("whiteblock-node%d", i), types.ContainerRemoveOptions{
+		cli.ContainerRemove(ctx, fmt.Sprintf("node%d", i), types.ContainerRemoveOptions{
 			Force: true,
 		})
 		if err != nil {
